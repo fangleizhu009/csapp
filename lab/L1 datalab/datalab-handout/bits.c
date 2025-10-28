@@ -195,6 +195,7 @@ int negate(int x) {
 int isAsciiDigit(int x) {
     return (!((x ^ 0x30) & 0xF8)) | (!(x ^ 0x38)) | (!(x ^ 0x39));
 }
+// AI说了我上段代码正确，但是还是通不过btest
 /* 
  * conditional - same as x ? y : z 
  *   Example: conditional(2,4,5) = 4
@@ -203,7 +204,7 @@ int isAsciiDigit(int x) {
  *   Rating: 3
  */
 int conditional(int x, int y, int z) {
-  return 2;
+    return (((~!!x) + 1) & y) | (((~!x) + 1) & z);
 }
 /* 
  * isLessOrEqual - if x <= y  then return 1, else return 0 
