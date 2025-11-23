@@ -230,18 +230,24 @@ int logicalNeg(int x) {
 }
 /* howManyBits - return the minimum number of bits required to represent x in
  *             two's complement
- *  Examples: howManyBits(12) = 5
- *            howManyBits(298) = 10
- *            howManyBits(-5) = 4
- *            howManyBits(0)  = 1
- *            howManyBits(-1) = 1
+ *  Examples: howManyBits(12) = 5  01100
+ *            howManyBits(298) = 10  0100101010
+ *            howManyBits(-5) = 4  1011
+ *            howManyBits(0)  = 1  0
+ *            howManyBits(-1) = 1  1
  *            howManyBits(0x80000000) = 32
  *  Legal ops: ! ~ & ^ | + << >>
  *  Max ops: 90
  *  Rating: 4
  */
 int howManyBits(int x) {
-  return 0;
+    return !((x >> 1) | 0x0) + !((~(x >> 1)) | 0x0)
+           + !((x >> 2) | 0x0) + !((~(x >> 2)) | 0x0)
+           + !((x >> 3) | 0x0) + !((~(x >> 3)) | 0x0)
+           + !((x >> 4) | 0x0) + !((~(x >> 4)) | 0x0)
+           + !((x >> 5) | 0x0) + !((~(x >> 5)) | 0x0)
+           + !((x >> 6) | 0x0) + !((~(x >> 6)) | 0x0)
+           ;
 }
 //float
 /* 
@@ -256,7 +262,7 @@ int howManyBits(int x) {
  *   Rating: 4
  */
 unsigned float_twice(unsigned uf) {
-  return 2;
+  return uf + 0x00800000;
 }
 /* 
  * float_i2f - Return bit-level equivalent of expression (float) x
