@@ -262,7 +262,9 @@ int howManyBits(int x) {
  *   Rating: 4
  */
 unsigned float_twice(unsigned uf) {
-  return uf + 0x00800000;
+    return uf + 0x00800000; // 这个好像只能是规格化的值才能这么弄，规格化的值只要阶码+1即可；规格化的要位数乘以2，即左移1位
+                            //  规格化的数，&0x7F800000后为0，！后为1
+                            //   非规格化的数，&0x7F800000后不为0，！后为0
 }
 /* 
  * float_i2f - Return bit-level equivalent of expression (float) x
