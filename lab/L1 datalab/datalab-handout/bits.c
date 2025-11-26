@@ -162,7 +162,9 @@ int tmin(void) {
  *   Rating: 2
  */
 int isTmax(int x) {
-  return ! (x ^ (~ (1 << 31)));
+  //return ! (x ^ (~ (1 << 31))); 这个结果正确，但是<<是非法字符
+  //return !((~(x + 1)) ^ x); 这个也是错误的，只考虑了0111...111的情况，没有排除111...111的情况
+  return (!((~(x + 1)) ^ x)) & (!!((~x) ^ 0));
 }
 /* 
  * allOddBits - return 1 if all odd-numbered bits in word set to 1
@@ -172,7 +174,14 @@ int isTmax(int x) {
  *   Rating: 2
  */
 int allOddBits(int x) {
-  return !((x ^ 0xFFFFFFFF) & (x ^ 0xAAAAAAAA));
+  //return !((x ^ 0xFFFFFFFF) & (x ^ 0xAAAAAAAA)); 这个是错误的，没有考虑A和F交替的情况
+  //正确的方式是，将这个数与0xA（1010）与，相当于把偶数位给mask了，结果再和1010异或，看是否相同
+  //生成32位AAA...AAA的方式是：先定义int A = 0xA，再定义int AA = A | (A << 4),以此类推
+  int A = 0xA;
+  int AA = A + (A << 4);
+  int AAAA = AA + (AA << 8);
+  int mask = AAAA + (AAAA << 16);
+  return ! ((x & mask) ^ mask);
 }
 /* 
  * negate - return -x 
