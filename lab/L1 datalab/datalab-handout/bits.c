@@ -204,9 +204,15 @@ int negate(int x) {
  *   Rating: 3
  */
 int isAsciiDigit(int x) {
-    return (!((x ^ 0x30) & 0xF8)) | (!(x ^ 0x38)) | (!(x ^ 0x39));
+    //return (!((x ^ 0x30) & 0xF8)) | (!(x ^ 0x38)) | (!(x ^ 0x39));
+    // AI说了我上段代码正确，但是还是通不过btest
+    //return !((x & 0xF8) ^ 0x30) | !((x & 0xFE) ^ 0x38);
+	//上面一段还是不对，没有考虑32位的情况
+	int cond1 = !(x >> 6);
+	int cond2 = !((x & 0xF8) ^ 0x30);
+	int cond3 = !((x & 0xFE) ^ 0x38);
+	return cond1 & (cond2 | cond3);
 }
-// AI说了我上段代码正确，但是还是通不过btest
 /* 
  * conditional - same as x ? y : z 
  *   Example: conditional(2,4,5) = 4
