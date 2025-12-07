@@ -221,7 +221,12 @@ int isAsciiDigit(int x) {
  *   Rating: 3
  */
 int conditional(int x, int y, int z) {
-    return (((~!!x) + 1) & y) | (((~!x) + 1) & z);
+    //return (((~!!x) + 1) & y) | (((~!x) + 1) & z);
+	int mask1 = (~!!x) + 1;
+	int mask2 = (~!x) + 1;
+	return (mask1 & y) | (mask2 & z);
+	//以上方法是我用我自己写的逻辑，用了中间表达式的方式重新表达
+	//另一中生成mask的方式是，((!!x) <<31) >>31，生成要么全1，要么全0；另外也不必定义mask2，mask2实际上就是~mask1
 }
 /* 
  * isLessOrEqual - if x <= y  then return 1, else return 0 
@@ -231,7 +236,20 @@ int conditional(int x, int y, int z) {
  *   Rating: 3
  */
 int isLessOrEqual(int x, int y) {
-    return ~((x + (~y) + 1) >> 31) + 1;
+    //return ~((x + (~y) + 1) >> 31) + 1; 这条没通过，下面的也是我自己想出来的
+	int result = x + (~y) + 1;
+	//return (result >> 31) | (!result);//这个也不行，右移31位，前面会填充0，还需要&1
+    //return ((result >> 31) & 1) | (!result);//还不行，没有考虑溢出情况
+	int signX = (x >> 31) & 0b1;
+	int signY = (y >> 31) & 0b1;
+    //case1 x+ y-，返回0
+	int case1 = signX & (!signY);
+    //case2 x- y_，返回1
+	int case2 = signX & (!signY);
+    //case3 xy同号，返回case3的结果
+    int case3_result = ((result >> 31) & 1) | (!result);
+	int case3 = (!(signX ^ signY)) & case3_result;
+	return case1 | case2 | case3;
 }
 //4
 /* 
@@ -243,7 +261,12 @@ int isLessOrEqual(int x, int y) {
  *   Rating: 4 
  */
 int logicalNeg(int x) {
-  return ~((x >> 31) | ((~x + 1) >> 31)) + 1;
+  //return ~((x >> 31) | ((~x + 1) >> 31)) + 1; 这个没通过测试
+  //下面的是自己想的
+  int SignBit = (x >> 31) & 0b1;
+  int minusOneSignBit = ((x - 1) >> 31) & 0b1;
+  return ~SignBit & minusOneSignBit;
+  //网上的结题思路是正数和它的相反数，signbit异或为1
 }
 /* howManyBits - return the minimum number of bits required to represent x in
  *             two's complement
@@ -258,13 +281,115 @@ int logicalNeg(int x) {
  *  Rating: 4
  */
 int howManyBits(int x) {
-    return !((x >> 1) | 0x0) + !((~(x >> 1)) | 0x0)
-           + !((x >> 2) | 0x0) + !((~(x >> 2)) | 0x0)
-           + !((x >> 3) | 0x0) + !((~(x >> 3)) | 0x0)
-           + !((x >> 4) | 0x0) + !((~(x >> 4)) | 0x0)
-           + !((x >> 5) | 0x0) + !((~(x >> 5)) | 0x0)
-           + !((x >> 6) | 0x0) + !((~(x >> 6)) | 0x0)
-           ;
+    //没做出来
+    //return !((x >> 1) | 0x0) + !((~(x >> 1)) | 0x0)
+    //       + !((x >> 2) | 0x0) + !((~(x >> 2)) | 0x0)
+    //       + !((x >> 3) | 0x0) + !((~(x >> 3)) | 0x0)
+    //       + !((x >> 4) | 0x0) + !((~(x >> 4)) | 0x0)
+    //       + !((x >> 5) | 0x0) + !((~(x >> 5)) | 0x0)
+    //       + !((x >> 6) | 0x0) + !((~(x >> 6)) | 0x0)
+    //       
+	int signbit32 = (x >> 31) & 0b1;
+    int signbit31 = (x >> 30) & 0b1;
+    int signbit30 = (x >> 29) & 0b1;
+    int signbit29 = (x >> 28) & 0b1;
+    int signbit28 = (x >> 27) & 0b1;
+    int signbit27 = (x >> 26) & 0b1;
+    int signbit26 = (x >> 25) & 0b1;
+	int signbit25 = (x >> 24) & 0b1;
+    int signbit24 = (x >> 23) & 0b1;
+    int signbit23 = (x >> 22) & 0b1;
+    int signbit22 = (x >> 21) & 0b1;
+    int signbit21 = (x >> 20) & 0b1;
+    int signbit20 = (x >> 19) & 0b1;
+    int signbit19 = (x >> 18) & 0b1;
+	int signbit18 = (x >> 17) & 0b1;
+    int signbit17 = (x >> 16) & 0b1;
+    int signbit16 = (x >> 15) & 0b1;
+    int signbit15 = (x >> 14) & 0b1;
+    int signbit14 = (x >> 13) & 0b1;
+    int signbit13 = (x >> 12) & 0b1;
+    int signbit12 = (x >> 11) & 0b1;
+	int signbit11 = (x >> 10) & 0b1;
+    int signbit10 = (x >> 9) & 0b1;
+    int signbit9 = (x >> 8) & 0b1;
+    int signbit8 = (x >> 7) & 0b1;
+    int signbit7 = (x >> 6) & 0b1;
+    int signbit6 = (x >> 5) & 0b1;
+    int signbit5 = (x >> 4) & 0b1;
+	int signbit4 = (x >> 3) & 0b1;
+    int signbit3 = (x >> 2) & 0b1;
+    int signbit2 = (x >> 1) & 0b1;
+    int signbit1 = x & 0b1;
+
+	int res32 = !(signbit32 ^ signbit31);
+	int res31 = !(signbit31 ^ signbit30);
+	int res30 = !(signbit30 ^ signbit29);
+	int res29 = !(signbit29 ^ signbit28);
+	int res28 = !(signbit28 ^ signbit27);
+	int res27 = !(signbit27 ^ signbit26);
+	int res26 = !(signbit26 ^ signbit25);
+	int res25 = !(signbit25 ^ signbit24);
+	int res24 = !(signbit24 ^ signbit23);
+	int res23 = !(signbit23 ^ signbit22);
+	int res22 = !(signbit22 ^ signbit21);
+	int res21 = !(signbit21 ^ signbit20);
+	int res20 = !(signbit20 ^ signbit19);
+	int res19 = !(signbit19 ^ signbit18);
+	int res18 = !(signbit18 ^ signbit17);
+	int res17 = !(signbit17 ^ signbit16);
+	int res16 = !(signbit16 ^ signbit15);
+	int res15 = !(signbit15 ^ signbit14);
+	int res14 = !(signbit14 ^ signbit13);
+	int res13 = !(signbit13 ^ signbit12);
+	int res12 = !(signbit12 ^ signbit11);
+	int res11 = !(signbit11 ^ signbit10);
+	int res10 = !(signbit10 ^ signbit9);
+	int res9 = !(signbit9 ^ signbit8);
+	int res8 = !(signbit8 ^ signbit7);
+	int res7 = !(signbit7 ^ signbit6);
+	int res6 = !(signbit6 ^ signbit5);
+	int res5 = !(signbit5 ^ signbit4);
+	int res4 = !(signbit4 ^ signbit3);
+	int res3 = !(signbit3 ^ signbit2);
+	int res2 = !(signbit2 ^ signbit1);
+
+    int res = res32
+	+ res32 * (res31
+	+ res31 * (res30
+	+ res30 * (res29
+	+ res29 * (res28
+	+ res28 * (res27
+	+ res27 * (res26
+	+ res26 * (res25
+	+ res25 * (res24
+	+ res24 * (res23
+	+ res23 * (res22
+	+ res22 * (res21
+	+ res21 * (res20
+	+ res20 * (res19
+	+ res19 * (res18
+	+ res18 * (res17
+	+ res17 * (res16
+	+ res16 * (res15
+	+ res15 * (res14
+	+ res14 * (res13
+	+ res13 * (res12
+	+ res12 * (res11
+	+ res11 * (res10
+	+ res10 * (res9
+	+ res9 * (res8
+	+ res8 * (res7
+	+ res7 * (res6
+	+ res6 * (res5
+	+ res5 * (res4
+	+ res4 * (res3
+	+ res3 * (res2
+	))))))))))))))))))))))))))))));
+
+	return 32 + (~res + 1);
+	//以上是自己做的，但是可能超出规定的操作符了，这道题目看过了网上的解题方法，还有更巧妙的
+
 }
 //float
 /* 
@@ -279,9 +404,38 @@ int howManyBits(int x) {
  *   Rating: 4
  */
 unsigned float_twice(unsigned uf) {
-    return uf + 0x00800000; // 这个好像只能是规格化的值才能这么弄，规格化的值只要阶码+1即可；规格化的要位数乘以2，即左移1位
+    //return uf + 0x00800000; // 这个好像只能是规格化的值才能这么弄，规格化的值只要阶码+1即可；规格化的要位数乘以2，即左移1位
                             //  规格化的数，&0x7F800000后为0，！后为1
                             //   非规格化的数，&0x7F800000后不为0，！后为0
+	//以上不算数，以下重新自己做
+	int s = (uf >> 31) & 0b1;
+	int exp = (uf >> 23) & 0xFF;
+	int frac = uf & 0b11111111111111111111111;
+	//case1: 规格化，且exp未到最大值；也不是特殊值
+	if ((exp != 0) & (exp != 0xfe) & (exp != 0xff))
+	{
+	exp = exp + 1;
+	}
+	//case2：规格化，且exp达到了最大值，返回inf
+	if (exp == 0xfe)
+	{
+	exp = 0xff;
+	frac = 0b00000000000000000000000;
+	}
+	//case3：非规格化，且frac未到最大值（frac未达到最大值的条件好像从来没用到）
+	if (exp == 0)
+	{
+	frac = frac << 1;
+	}
+	//case4：特殊值
+	if (exp == 0xff)
+	{
+	exp = exp;
+	frac = frac;
+	}
+	//重新组装
+	return (s << 31) | (exp <<23) | frac;
+
 }
 /* 
  * float_i2f - Return bit-level equivalent of expression (float) x
