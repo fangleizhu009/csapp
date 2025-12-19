@@ -408,9 +408,9 @@ unsigned float_twice(unsigned uf) {
                             //  规格化的数，&0x7F800000后为0，！后为1
                             //   非规格化的数，&0x7F800000后不为0，！后为0
 	//以上不算数，以下重新自己做
-	int s = (uf >> 31) & 0b1;
+	int s = (uf >> 31) & 0b1; //int 应该用 unsigned
 	int exp = (uf >> 23) & 0xFF;
-	int frac = uf & 0b11111111111111111111111;
+	int frac = uf & 0b11111111111111111111111; //uf & 0x7FFFFFFF也行
 	//case1: 规格化，且exp未到最大值；也不是特殊值
 	if ((exp != 0) & (exp != 0xfe) & (exp != 0xff))
 	{
@@ -447,7 +447,99 @@ unsigned float_twice(unsigned uf) {
  *   Rating: 4
  */
 unsigned float_i2f(int x) {
-  return 2;
+    int result;
+	int s;
+	int exp;
+	int frac;
+	int len;
+
+	//如果是0
+	if (x == 0){
+	s = 0;
+	exp = 0x00;
+	frac = 0b00000000000000000000000;
+    result = (s<< 31) | (exp << 23) | frac;
+	}
+
+    s = (x >> 31) & 0b1;
+	//正数的情况下
+	if ((s == 0) & (x != 0)){
+	int y = x;
+	int len16;
+	len16 = 16 * (!!(x >> 16));
+    x = x >> len16;
+	x = x & 0xFFFF;
+    int len8;
+	len8 = 8 * (!!(x >> 8));
+    x = x >> len8;
+	x = x & 0xFF;
+	int len4;
+	len4 = 4 * (!!(x >> 4));
+    x = x >> len4;
+	x = x & 0xF;
+	int len2;
+	len2 = 2 * (!!(x >> 2));
+    x = x >> len2;
+	x = x & 0b11;
+	int len1;
+	len1 = 1 * (!!(x >> 1));
+    x = x >> len1;
+	x = x & 0b1;
+	int len0;
+	len0 = 1* (!!x);
+	int len;
+	len = len16 + len8 + len4 + len2 + len1 + len0;
+	exp = (len - 1) + 127;
+	frac = y & (~(~(0b0) << (len-2)));
+	result = (s<< 31) | (exp << 23) | frac;
+	};
+
+	//负数的情况下，但不是Tmin
+	if ((s == 1) & (x != 0x80000000)){
+	int y;
+	y = x;
+	x = ~x + 1;
+
+	int len16;
+	len16 = 16 * (!!(x >> 16));
+    x = x >> len16;
+	x = x & 0xFFFF;
+    int len8;
+	len8 = 8 * (!!(x >> 8));
+    x = x >> len8;
+	x = x & 0xFF;
+	int len4;
+	len4 = 4 * (!!(x >> 4));
+    x = x >> len4;
+	x = x & 0xF;
+	int len2;
+	len2 = 2 * (!!(x >> 2));
+    x = x >> len2;
+	x = x & 0b11;
+	int len1;
+	len1 = 1 * (!!(x >> 1));
+    x = x >> len1;
+	x = x & 0b1;
+	int len0;
+	len0 = 1* (!!x);
+	int len;
+	len = len16 + len8 + len4 + len2 + len1 + len0;
+	exp = (len - 1) + 127;
+	frac = y & (~(~(0b0) << (len-2)));
+	result = (s<< 31) | (exp << 23) | frac;
+
+	};
+
+	//负数且Tmin
+	if ((s == 1) & (x == 0x80000000)){
+	s = 1;
+	exp = 31 + 127;
+	frac = 0x00000000 & (~(0b0 << 23));
+    result = (s<< 31) | (exp << 23) | frac;
+	};
+
+
+	return result;
 }
 /* 
  * float_f2i - Return bit-level equivalent of expression (int) f
